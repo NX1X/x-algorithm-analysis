@@ -1,4 +1,4 @@
-# X "For You" Algorithm — Technical Conclusions
+# X "For You" Algorithm - Technical Conclusions
 
 📂 [Overview](README.md) · 🔧 **Technical** *(you are here)* · 👤 [For Users](WHAT_USERS_SHOULD_KNOW.md)
 
@@ -28,13 +28,13 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 
 ## 2. ML Core (Phoenix)
 
-**Backbone (`grok.py`)** — decoder-only transformer ported from Grok-1:
+**Backbone (`grok.py`)** - decoder-only transformer ported from Grok-1:
 - RMSNorm (fp32, eps 1e-5), RoPE (base 1e4), GeGLU FFN, **sandwich-style** norm
   (normalizes sublayer output before residual add).
 - tanh logit soft-cap at ±30, fp32 softmax, `attn_output_multiplier = 0.125`
   (explicit 1/8 attention temperature, not 1/√d).
 - GQA is *configured* (`num_q_heads`/`num_kv_heads`) but **every provided config sets them
-  equal — GQA is unused**.
+  equal - GQA is unused**.
 - **No Mixture-of-Experts** despite the filename; `DenseBlock` is a single dense GeGLU.
 
 **Ranker (`recsys_model.py`)**:
@@ -47,10 +47,10 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 - **Signed action encoding** `(2·a − 1)`: distinguishes absent action (−1) from padding
   (masked). Candidates get no action embeddings (no engagement yet).
 - Post-age bucketing: 60-min granularity to 80h (`POST_AGE_MAX_MINUTES=4800`), vocab 82.
-- ~19 discrete actions (sigmoid, multi-label — **not softmax**) + continuous head
+- ~19 discrete actions (sigmoid, multi-label - **not softmax**) + continuous head
   (dwell). Negative-feedback indices `[14,15,16,17]` = not-interested/block/mute/report.
 - **Right-anchored RoPE**: newest history pinned to a fixed position; all candidates share
-  one position — removes inter-candidate positional bias, normalizes recency across
+  one position - removes inter-candidate positional bias, normalizes recency across
   variable history lengths.
 
 **Retrieval (`recsys_retrieval_model.py`)**:
@@ -65,7 +65,7 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 - **Two conflicting action-index conventions**: `runners.py ACTIONS` (fav=0…) vs
   `run_pipeline.py IDX_*` (fav=1…). The released pipeline hardcodes a blend
   `fav·1.0 + reply·0.5 + rt·0.3 + dwell·0.2` while the runner hardcodes `favorite_score`
-  as the sole sort key — two definitions of "the score".
+  as the sole sort key - two definitions of "the score".
 - `run_pipeline.py` carries checkpoint-compat hacks (fabricated 64 global-negative
   candidates, unused `log_temperature`).
 
@@ -82,15 +82,15 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 - ~14 sequential pre-scoring filters; post-selection: `VFFilter`, `AncillaryVFFilter`,
   `DedupConversationFilter`. Visibility is dual-pathed (in-network `TimelineHome` vs OON
   stricter `TimelineHomeRecommendations`).
-- **Scoring (`RankingScorer`)** — the production combiner:
+- **Scoring (`RankingScorer`)** - the production combiner:
   - Weighted linear sum of ~21 Phoenix heads; **all weights are feature-switch-tunable at
-    request time** (no hardcoded constants in the live path — legacy `weighted_scorer.rs`/
+    request time** (no hardcoded constants in the live path - legacy `weighted_scorer.rs`/
     `oon_scorer.rs`/`author_diversity_scorer.rs` are dead code, absent from `mod.rs`).
   - Negative heads (not-interested/block/mute/report/not-dwelled) subtracted.
   - Offset/normalization rescales negatives into a positive band.
   - **Author diversity**: per-author k-th post ×`(1−floor)·decay^k + floor`.
   - **OON multiplier**: distinct factors for normal / topic / eligible-new-user.
-  - Optional **VMRanker** value model with **DPP** diversity — overrides final score.
+  - Optional **VMRanker** value model with **DPP** diversity - overrides final score.
 - **New-user model swap**: short action sequence → dedicated Phoenix retrieval+scoring
   cluster (live-swappable via deciders).
 - **180s Redis candidate cache**: hit (≥500 posts) skips retrieval + Phoenix scoring;
@@ -170,16 +170,16 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 
 ## 7. Key Engineering Takeaways
 
-1. **Candidate isolation** is the architectural keystone — enables parallel scoring,
+1. **Candidate isolation** is the architectural keystone - enables parallel scoring,
    determinism, and the home-mixer candidate cache.
 2. **Feature-less, sequence-driven** modeling concentrates all relevance logic in one
    transformer; simpler pipelines, opaque behavior, total checkpoint dependence.
-3. **Negative feedback is a first-class loss term** — the model optimizes against
+3. **Negative feedback is a first-class loss term** - the model optimizes against
    block/mute/report, not only for engagement.
 4. **Differentiated risk postures**: fail-closed for safety/ads, fail-open (silent
    degradation) for the serving path. Telemetry is load-bearing for detecting the latter.
 5. **Mature production system, partial release**: probabilistic logging, cross-DC caches,
-   cold-start throttling, RAII metrics — but mini frozen checkpoints, blanked config,
+   cold-start throttling, RAII metrics - but mini frozen checkpoints, blanked config,
    dual conventions, and migration dead code mean it is representative, not reproducible.
 
 ---
@@ -187,22 +187,22 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 ## 8. Cross-Cutting Themes
 
 1. **Model does the heavy lifting.** Eliminating hand-engineered features pushes all
-   relevance logic into one transformer learning from raw engagement — simpler pipelines,
+   relevance logic into one transformer learning from raw engagement - simpler pipelines,
    but opaque and wholly dependent on the trained checkpoint's quality/freshness.
 2. **Candidate isolation is the keystone.** The attention mask makes scoring parallel,
-   deterministic, and cacheable — and enables the 180s candidate-cache fast-path.
+   deterministic, and cacheable - and enables the 180s candidate-cache fast-path.
 3. **Negative feedback is a first-class objective.** The model explicitly predicts and
-   subtracts not-interested/block/mute/report — it optimizes against being disliked.
+   subtracts not-interested/block/mute/report - it optimizes against being disliked.
 4. **Fail-closed for safety/ads, fail-open for general degradation.** Conservative
    suppression on missing safety data; silent stale/zero degradation on the serving path.
 5. **Heavy operational engineering.** Sub-ms stores, two-phase pipelines, probabilistic
-   logging, regional Redis replication, cold-start throttling — a mature production system.
+   logging, regional Redis replication, cold-start throttling - a mature production system.
 6. **Partial, snapshot-only release.** Mini frozen checkpoints, blanked thresholds/prompts,
-   dual conventions, migration dead code — representative and educational, not reproducible.
+   dual conventions, migration dead code - representative and educational, not reproducible.
 
 ---
 
-## 9. Overall Assessment — Strengths vs Risks
+## 9. Overall Assessment - Strengths vs Risks
 
 **Strengths**
 - Architecturally elegant: clean two-stage recsys, composable observable pipeline
@@ -214,11 +214,11 @@ grox (async, continuous): Grok-LLM annotations → Unified Post Annotations → 
 
 **Risks / Concerns**
 - Total dependence on an opaque transformer with no interpretable feature attribution.
-- LLM-generated content verdicts (Grox) directly drive visibility and enforcement —
+- LLM-generated content verdicts (Grox) directly drive visibility and enforcement -
   non-deterministic across model versions; single hardcoded thresholds gate promotion.
 - Silent degradation paths (Gizmoduck 200ms timeout → default viewer; missing
   `following_user_ids` → empty feed; failing hydrators → stale data) are only visible via
-  telemetry — monitoring is load-bearing.
+  telemetry - monitoring is load-bearing.
 - Internal inconsistencies (dual action-index conventions, dual "final score"
   definitions, dead code) indicate a system mid-migration; the published artifacts won't
   reproduce production behavior without the withheld config.

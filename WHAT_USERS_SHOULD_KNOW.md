@@ -10,7 +10,7 @@
 ## 1. The Feed Is Almost Entirely AI-Decided
 
 X removed nearly all hand-written rules. What you see is decided by a large AI model
-(a Grok-based transformer) that **learns from your behavior** — what you like, reply to,
+(a Grok-based transformer) that **learns from your behavior** - what you like, reply to,
 repost, quote, click, watch, and how long you linger. There is no simple "chronological"
 or "topical" rule behind it; the model infers what you want from your engagement history.
 
@@ -38,7 +38,7 @@ dwelling.
 
 > **Important:** The system actively predicts whether you'll *dislike* something. Content
 > the model thinks you'd block, mute, or report is **demoted on purpose**. Using the
-> "Not interested", mute, and block tools genuinely shapes your feed — they are real
+> "Not interested", mute, and block tools genuinely shapes your feed - they are real
 > training signals, not cosmetic.
 
 Your final feed order is a **weighted sum** of all these predictions. Likes, replies,
@@ -50,12 +50,12 @@ reposts, and dwell time carry the most visible weight.
 
 The system pulls together a substantial amount of context per request:
 
-- Your **engagement history** (the core personalization signal — a sequence of your past
+- Your **engagement history** (the core personalization signal - a sequence of your past
   actions on posts and authors).
 - Your **social graph**: who you follow, block, mute, subscribe to, and mutual-follow
   overlap with authors.
 - **Topics and starter packs** you follow, and AI-**inferred topic interests**.
-- Posts you've **already seen or were recently served** (to avoid repeats — tracked via an
+- Posts you've **already seen or were recently served** (to avoid repeats - tracked via an
   impression history and a probabilistic "Bloom filter").
 - **Demographics**, **inferred gender** (for brand-new accounts a model predicts it),
   and **approximate location from your IP address**.
@@ -75,7 +75,7 @@ Beyond the AI score, posts can be filtered or downranked because they are:
 - Behind a paid subscription you don't have.
 - Containing your **muted keywords**.
 - Previously seen or already served to you.
-- Flagged by **visibility/safety filtering** — content judged deleted, spam, violent,
+- Flagged by **visibility/safety filtering** - content judged deleted, spam, violent,
   gore, or otherwise rule-violating is dropped, especially for out-of-network content
   (which is held to a *stricter* safety bar than posts from people you follow).
 
@@ -86,7 +86,7 @@ automated enforcement:
 - Replies under large accounts get an AI **reply-quality score**; spammy replies from
   low-follower accounts under big posts are specifically targeted for demotion.
 - Adult, violent, and unsafe content gets escalating AI scrutiny (multiple models). Safety
-  labels are **"sticky"** — once flagged, hard to un-flag in that path. The system is
+  labels are **"sticky"** - once flagged, hard to un-flag in that path. The system is
   deliberately biased toward over-suppressing unsafe content rather than under-suppressing.
 
 > Note: these moderation judgments are made by an AI language model. They are
@@ -95,7 +95,7 @@ automated enforcement:
 
 ---
 
-## 5. Author Diversity — Why You Don't See One Person 10× in a Row
+## 5. Author Diversity - Why You Don't See One Person 10× in a Row
 
 Even if one account would otherwise dominate your feed, the algorithm **deliberately
 attenuates repeated posts from the same author** within a single feed load. The first post
@@ -112,7 +112,7 @@ If your account is new or has little engagement history:
   few followed accounts to draw from.
 - New users may get a topic-interest-based feed until enough behavior is collected.
 
-So your early experience is **not** representative of the steady-state algorithm — the
+So your early experience is **not** representative of the steady-state algorithm - the
 feed changes meaningfully as you engage.
 
 ---
@@ -125,11 +125,11 @@ feed changes meaningfully as you engage.
 - Ads have **brand-safety protections**: an ad won't be placed next to content judged
   risky, and advertisers can block their ads from appearing near specific accounts or
   keywords. Content that hasn't been safety-reviewed is treated as risky-for-ads by
-  default (it can still appear organically — this rule is about ad adjacency).
+  default (it can still appear organically - this rule is about ad adjacency).
 
 ---
 
-## 8. Caching — Why Your Feed Sometimes Feels Slightly Stale
+## 8. Caching - Why Your Feed Sometimes Feels Slightly Stale
 
 For speed, the system can cache a batch of pre-scored candidate posts for you for **about
 3 minutes**. On a refresh within that window, it may re-rank cached posts rather than
@@ -161,9 +161,9 @@ missing for a short window in exchange for a faster feed.
 | See more of a topic/person | Engage genuinely: like, reply, repost, dwell, follow |
 | See less of something | Use **Not interested**, **Mute**, **Block**, mute keywords |
 | Reduce repeats from one account | The algorithm already limits this per refresh |
-| Get a better feed faster | Engage consistently — the model adapts to your behavior over time |
+| Get a better feed faster | Engage consistently - the model adapts to your behavior over time |
 | Understand new-account feeds | Expect it to improve and change as you interact |
-| Reduce tracked context | Following fewer accounts/topics and limiting engagement reduces signal — but also reduces personalization |
+| Reduce tracked context | Following fewer accounts/topics and limiting engagement reduces signal - but also reduces personalization |
 
 ---
 

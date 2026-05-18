@@ -3,7 +3,7 @@
 ================================================================================
 
 This MIT License applies ONLY to the original analysis and documentation
-authored in this repository — i.e. the files at the repository root:
+authored in this repository - i.e. the files at the repository root:
 
     README.md
     ANALYSIS.md
@@ -12,7 +12,7 @@ authored in this repository — i.e. the files at the repository root:
 
 It does NOT apply to the code under `upstream/`. That directory contains X's
 open-sourced "For You" algorithm, which is distributed under the Apache
-License 2.0 — see `upstream/LICENSE`. Nothing here relicenses or supersedes
+License 2.0 - see `upstream/LICENSE`. Nothing here relicenses or supersedes
 that work; the analysis is independent commentary on publicly released code.
 
 ================================================================================

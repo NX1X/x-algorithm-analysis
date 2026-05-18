@@ -1,4 +1,4 @@
-# X "For You" Algorithm — Analysis
+# X "For You" Algorithm - Analysis
 
 📂 **Overview** · 🔧 [Technical](TECHNICAL_CONCLUSIONS.md) · 👤 [For Users](WHAT_USERS_SHOULD_KNOW.md)
 
@@ -6,19 +6,19 @@ An independent, code-level analysis of **X's open-sourced "For You" feed algorit
 
 X published the source for its recommendation system at
 **[github.com/xai-org/x-algorithm](https://github.com/xai-org/x-algorithm)**. This repo
-reads through **all of it** — the ML models, the Rust serving pipeline, the in-network
-store, and the Grok-LLM content-understanding service — and turns it into clear
+reads through **all of it** - the ML models, the Rust serving pipeline, the in-network
+store, and the Grok-LLM content-understanding service - and turns it into clear
 conclusions.
 
 > Produced with [Claude Code](https://www.anthropic.com/claude-code) doing a full source
-> read. **Unofficial** — not affiliated with or endorsed by X. Findings describe the
+> read. **Unofficial** - not affiliated with or endorsed by X. Findings describe the
 > *published* code; exact production tuning values are not in the open-source release.
 
 ---
 
 ## 📚 Where to go next
 
-This page **is** the overview — read it top to bottom for the whole story in ~3 minutes.
+This page **is** the overview - read it top to bottom for the whole story in ~3 minutes.
 Then branch by who you are:
 
 | Document | For whom | What's inside |
@@ -30,7 +30,7 @@ Then branch by who you are:
 
 ## 🧠 TL;DR
 
-- The feed is almost **rule-free** — one Grok-based transformer learns relevance from your
+- The feed is almost **rule-free** - one Grok-based transformer learns relevance from your
   raw engagement history.
 - It predicts **~19 actions** per post, including whether you'd **block, mute, or report**
   it. It optimizes *against being disliked*, not only for likes.
@@ -46,7 +46,7 @@ Then branch by who you are:
 ## 🏗 The System in One Look
 
 It's a classic two-stage **retrieval → ranking** recommender. The distinctive choice:
-**almost all hand-engineered features were removed** — relevance is learned end-to-end by
+**almost all hand-engineered features were removed** - relevance is learned end-to-end by
 a Grok-derived transformer from your raw engagement sequence.
 
 Five cooperating parts:
@@ -54,7 +54,7 @@ Five cooperating parts:
 | Component | Language | Role |
 |---|---|---|
 | **`phoenix/`** | Python / JAX | The ML brain: two-tower retrieval + transformer ranker (ported from Grok-1) |
-| **`home-mixer/`** | Rust | Orchestration: builds the feed — sources, hydration, filters, scoring, ads |
+| **`home-mixer/`** | Rust | Orchestration: builds the feed - sources, hydration, filters, scoring, ads |
 | **`thunder/`** | Rust | In-memory store of recent in-network posts (sub-ms lookup) |
 | **`candidate-pipeline/`** | Rust | Reusable, observable pipeline framework under home-mixer |
 | **`grox/`** | Python | Grok-LLM content understanding: safety, spam, quality, embeddings |
@@ -73,12 +73,12 @@ ranking and enforcement.
 **1. Retrieval (millions → hundreds).** A two-tower model: the *user tower* runs the full
 Grok transformer over your history into one embedding; the *candidate tower* is
 deliberately transformer-free so the whole corpus can be precomputed. Retrieval is cosine
-similarity. In-network posts skip ML entirely — `thunder` serves recent followed-account
+similarity. In-network posts skip ML entirely - `thunder` serves recent followed-account
 posts ranked **purely by recency**.
 
 **2. Ranking (hundreds → feed).** A transformer with **candidate isolation**: each
 candidate post can attend to your history but **never to other candidate posts**. So all
-candidates are scored in one parallel pass, mutually independent — consistent and
+candidates are scored in one parallel pass, mutually independent - consistent and
 cacheable. The model predicts **~19 engagement actions** at once (positive: like, reply,
 repost, dwell…; **negative: not-interested, block, mute, report**). Final score = a
 **weighted sum** of these probabilities; negative actions carry negative weights, actively
@@ -106,10 +106,10 @@ that distinguishes "action absent" from "padding."
 
 **Risks**
 - Total dependence on an opaque transformer with no interpretable feature attribution.
-- LLM-generated content verdicts (Grox) directly drive visibility and enforcement —
+- LLM-generated content verdicts (Grox) directly drive visibility and enforcement -
   non-deterministic across model versions; single hardcoded thresholds gate promotion.
 - Silent degradation paths (timeouts → default data; missing inputs → empty feed) are
-  visible only via telemetry — monitoring is load-bearing.
+  visible only via telemetry - monitoring is load-bearing.
 - Internal inconsistencies and dead code indicate a system mid-migration; the public
   artifacts won't reproduce production behavior without the withheld config.
 
@@ -123,16 +123,16 @@ that distinguishes "action absent" from "padding."
 
 ```
 .
-├── README.md                    # you are here — hub + overview
+├── README.md                    # you are here - hub + overview
 ├── TECHNICAL_CONCLUSIONS.md     # engineer-facing deep dive
 ├── WHAT_USERS_SHOULD_KNOW.md    # user-facing explainer
-├── LICENSE                      # MIT — covers the analysis docs above
+├── LICENSE                      # MIT - covers the analysis docs above
 └── upstream/                    # X's original code, UNMODIFIED
     ├── README.md                # X's original project README
-    ├── LICENSE                  # Apache-2.0 — covers everything in upstream/
+    ├── LICENSE                  # Apache-2.0 - covers everything in upstream/
     ├── CODE_OF_CONDUCT.md       # X's original
     ├── phoenix/                 # ML: retrieval + ranking (Python/JAX)
-    │   └── artifacts/           # NOT included — large binary (>2 GiB), see note below
+    │   └── artifacts/           # NOT included - large binary (>2 GiB), see note below
     ├── home-mixer/              # orchestration / serving (Rust)
     ├── thunder/                 # in-network post store (Rust)
     ├── candidate-pipeline/      # reusable pipeline framework (Rust)
@@ -143,7 +143,7 @@ Everything under [`upstream/`](upstream/) is X's original source, kept **unmodif
 faithful reference and diffing. All original analysis lives at the repository root.
 
 > **⚠️ Excluded artifact:** `upstream/phoenix/artifacts/oss-phoenix-artifacts.zip` (the
-> pretrained Phoenix model artifacts, **>2 GiB**) is **not bundled** in this repository —
+> pretrained Phoenix model artifacts, **>2 GiB**) is **not bundled** in this repository -
 > it exceeds GitHub's hard 2 GiB per-file limit. Download it from X's official release:
 > **[xai-org/x-algorithm → phoenix/artifacts/oss-phoenix-artifacts.zip](https://github.com/xai-org/x-algorithm/blob/main/phoenix/artifacts/oss-phoenix-artifacts.zip)**.
 > Place it at `upstream/phoenix/artifacts/` locally if you need to run the model.
@@ -152,12 +152,12 @@ faithful reference and diffing. All original analysis lives at the repository ro
 
 ## 📌 Licensing & Attribution
 
-This repository is **dual-licensed by directory** — read this before reusing anything:
+This repository is **dual-licensed by directory** - read this before reusing anything:
 
 | Path | Content | License |
 |---|---|---|
-| Repository root (`*.md`) | The independent analysis & docs | **MIT** — see [LICENSE](LICENSE) |
-| [`upstream/`](upstream/) | X's open-sourced "For You" algorithm | **Apache-2.0** — see [`upstream/LICENSE`](upstream/LICENSE) |
+| Repository root (`*.md`) | The independent analysis & docs | **MIT** - see [LICENSE](LICENSE) |
+| [`upstream/`](upstream/) | X's open-sourced "For You" algorithm | **Apache-2.0** - see [`upstream/LICENSE`](upstream/LICENSE) |
 
 - The analysis docs are independent commentary; reuse them freely under MIT.
 - The `upstream/` code belongs to X under its original Apache-2.0 terms, mirrored
