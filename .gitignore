@@ -1,0 +1,11 @@
+# Large upstream binary artifact (>2 GiB). Exceeds GitHub's hard per-file
+# limit, so it is NOT stored here — see README for the official download link.
+upstream/phoenix/artifacts/
+
+# Maintainer-only working notes / drafts (social posts, personal docs).
+# Not part of the published analysis — kept local, intentionally untracked.
+docs-internal/
+.claude/
+.github/
+.vscode/
+CLAUDE.md
