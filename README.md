@@ -1,5 +1,7 @@
 # X "For You" Algorithm - Analysis
 
+[![Views](https://hits.sh/github.com/NX1X/x-algorithm-analysis.svg?label=views&color=1f6feb)](https://hits.sh/github.com/NX1X/x-algorithm-analysis/)
+
 📂 **Overview** · 🔧 [Technical](TECHNICAL_CONCLUSIONS.md) · 👤 [For Users](WHAT_USERS_SHOULD_KNOW.md)
 
 An independent, code-level analysis of **X's open-sourced "For You" feed algorithm**.
